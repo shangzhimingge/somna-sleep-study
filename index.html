@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#14141b">
+  <meta name="description" content="眠相 Somna，给每一个夜晚一份清晰的回答。">
+  <title>眠相 Somna — 好眠，从今晚开始</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="story.js" defer></script>
+</head>
+<body id="home">
+  <header class="masthead">
+    <div class="frame nav">
+      <a class="brand" href="#home" aria-label="眠相首页"><span class="moon" aria-hidden="true"></span> SOMNA<span class="brand-divider"></span><span class="brand-cn">眠相</span></a>
+      <nav aria-label="主要导航">
+        <a href="#how">工作原理</a><a href="#report">睡眠报告</a>
+      </nav>
+      <a class="nav-link" href="#report">体验监测</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero frame" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="signal"></span>为夜晚设计的睡眠监测</p>
+        <h1 id="hero-title">好眠，<br><span>从今晚开始。</span></h1>
+        <p class="hero-description" id="hero-description">在你睡着的时候，眠相替你留意。<br>从呼吸与翻身，到每一次清醒，<br>让清晨的你看懂昨晚发生了什么。</p>
+        <div class="hero-actions">
+          <a class="button" href="#report">查看样本报告</a>
+          <a class="text-link" href="#how">了解工作原理</a>
+        </div>
+      </div>
+      <figure class="hero-image">
+        <img src="assets/hero.webp" alt="暮色透过落地窗，照在铺着深蓝色床品的卧室里" width="1536" height="1024" fetchpriority="high">
+        <figcaption><span></span><span>夜间监测中</span><time datetime="23:48">23:48</time></figcaption>
+      </figure>
+    </section>
+
+    <aside class="benefits" id="how" aria-label="工作原理">
+      <div class="frame benefits-row">
+        <div><span class="line-icon pulse" aria-hidden="true"></span><span><strong>呼吸节律</strong><small>从床边感知呼吸变化</small></span></div>
+        <div><span class="line-icon phases" aria-hidden="true"></span><span><strong>睡眠分期</strong><small>读懂一整晚的深浅起伏</small></span></div>
+        <div><span class="line-icon sun" aria-hidden="true"></span><span><strong>晨间报告</strong><small>起床后回看昨夜的细节</small></span></div>
+      </div>
+    </aside>
+
+    <section class="report" id="report" aria-labelledby="report-title">
+      <div class="frame report-layout">
+        <div class="report-copy">
+          <p class="eyebrow"><span class="small-rule"></span> 晨间报告</p>
+          <h2 id="report-title">把一整晚，<br>看得更清楚。</h2>
+          <p>一夜之间，你会在深睡、浅睡与短暂清醒之间来回切换。点击报告里的时间点，看看眠相记录了什么。</p>
+          <p class="sample-label">交互样本 <span></span> B-041</p>
+        </div>
+        <div class="report-card">
+          <div class="card-top"><span><i></i>监测完成</span><span>B-041 / 单人卧室</span></div>
+          <div class="report-numbers"><div><span>总监测时长</span><strong>7<small>小时</small> 36<small>分</small></strong></div><div><span>入睡时间</span><strong>23:48</strong></div></div>
+          <div class="chart">
+            <div class="chart-axis" aria-hidden="true"><span>清醒</span><span>浅睡</span><span>深睡</span></div>
+            <canvas id="chart" role="img" aria-label="睡眠分期曲线，凌晨 02:17 出现一段被标记的记录"></canvas>
+          </div>
+          <div class="times" role="group" aria-label="选择一个记录时间">
+            <button type="button" aria-pressed="true" data-record="start">23:48</button>
+            <button type="button" aria-pressed="false" data-record="anomaly">02:17 <span aria-hidden="true">·</span></button>
+            <button type="button" aria-pressed="false" data-record="end">07:24</button>
+          </div>
+          <p class="chart-note" id="chart-note" aria-live="polite">23:48　检测到一位使用者入睡。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="appendix" id="appendix" aria-labelledby="appendix-title">
+      <div class="narrow">
+        <p class="eyebrow"><span class="small-rule"></span> 报告附注 / B-041</p>
+        <h2 id="appendix-title">有一段没有<br>计入报告。</h2>
+        <p class="appendix-summary">系统检测到两组呼吸。主信号每分钟十四次。另一组每次都慢半拍。</p>
+        <ol class="log" aria-label="监测记录">
+          <li><time datetime="02:17">02:17:06</time><span>检测到第二组呼吸。</span></li>
+          <li><time datetime="02:18">02:18:19</time><span>主信号中断十一秒。第二组随即中断十一秒。</span></li>
+          <li><time datetime="02:21">02:21:44</time><span>使用者起床查看。两组呼吸同时恢复。<small>床垫压力：0 kg</small></span></li>
+          <li><time datetime="02:24">02:24:11</time><span>使用者重新躺下。<small>床垫压力：未变化</small></span></li>
+        </ol>
+        <p class="footnote">这段记录已连续三晚被系统归为背景噪音。</p>
+      </div>
+    </section>
+
+    <section class="archive" aria-labelledby="archive-title">
+      <div class="frame archive-layout">
+        <div class="archive-caption">
+          <p class="eyebrow"><span class="small-rule"></span> 原始记录 / 第四晚</p>
+          <h2 id="archive-title">你关门了吗？</h2>
+          <p>使用者在睡前留言里说，他每晚都会把门关严。只有半夜醒过来时，门才会留着一条缝。</p>
+          <p>这是第二组呼吸出现之前，设备保留的最后一帧。</p>
+        </div>
+        <figure class="hall-frame">
+          <div class="hall-image">
+            <img src="assets/hall.webp" alt="深夜的走廊尽头，卧室门开着一条缝，缝里能看见床沿" width="1536" height="1024" loading="lazy">
+            <span class="capture-time"><i></i> 02:16:59</span><span class="capture-id">B-041 / CAM 01</span>
+          </div>
+          <figcaption>第二组呼吸出现前 7 秒 <span>录音保留 · 画面归档</span></figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="transcript" aria-labelledby="transcript-title">
+      <div class="narrow">
+        <p class="eyebrow"><span class="small-rule"></span> 录音转写 / 03:13</p>
+        <h2 id="transcript-title">它学得很慢。</h2>
+        <p class="transcript-intro">第四晚，第二组呼吸终于和第一组完全重合。设备准备合并两条记录时，从不同方位收到了同一个人的声音。</p>
+        <dl class="dialogue">
+          <div><dt>03:13:02 <span>床上</span></dt><dd>「妈，我去上个厕所。」</dd></div>
+          <div><dt>03:13:05 <span>床下</span></dt><dd>「妈，别让他出去。」</dd></div>
+        </dl>
+        <p class="voice-match">声纹与使用者匹配<span>两段均匹配</span></p>
+      </div>
+    </section>
+
+    <section class="finale" aria-labelledby="final-title">
+      <div class="final-backdrop" aria-hidden="true"></div>
+      <div class="final-content">
+        <p class="eyebrow"><span class="small-rule"></span> 最后一条记录 / 03:14</p>
+        <p class="final-before">卧室外的走廊传来两次脚步声。<br>有人打开了门，站了一会儿。</p>
+        <h2 id="final-title">「你出来吧。<br><span>妈妈已经睡了。」</span></h2>
+        <p class="final-source">声源位置 <span></span> 床下</p>
+        <div class="final-tail">
+          <p>脚步声停了四十七秒。<br>然后它也开始屏住呼吸。</p>
+          <button type="button" class="return" id="return">回到首页</button>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer class="archive-footer"><span>SOMNA / B-041</span><span>虚构互动叙事</span></footer>
+</body>
+</html>
