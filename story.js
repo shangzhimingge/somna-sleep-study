@@ -5,7 +5,7 @@ const note = byId("chart-note");
 const reportButtons = [...document.querySelectorAll("[data-record]")];
 const heroPhoto = byId("hero-photo");
 const checkpoint = byId("final-checkpoint");
-const storyKey = "somna-b041-session-v5";
+const storyKey = "somna-b041-session-v6";
 const clock = new Intl.DateTimeFormat("zh-CN", {
   hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23",
 });
@@ -18,9 +18,9 @@ const lighting = [
 ];
 
 const records = {
-  start: { position: 0, time: "23:48", text: "检测到一位使用者入睡。", revised: "你打开了这页。旧报告的入睡时间已被替换。" },
-  anomaly: { position: 149 / 456, time: "02:17", text: "有一段信号暂时无法判定，已另存为附注。", revised: "你开始向下翻。原来那段标记已被替换。" },
-  end: { position: 1, time: "07:24", text: "监测结束，已生成晨间摘要。", revised: "你读到了页面末尾。报告仍在更新。" },
+  start: { position: 0, time: "23:48", text: "检测到一位使用者入睡。", revised: "你打开了这页。眠相把这一刻记成了「入睡」。" },
+  anomaly: { position: 149 / 456, time: "02:17", text: "有一段信号暂时无法判定，已另存为附注。", revised: "你第一次向下翻。眠相把滚动记成了「翻身」。" },
+  end: { position: 1, time: "07:24", text: "监测结束，已生成晨间摘要。", revised: "你读到了页尾。眠相已生成报告，仍把你标成「睡着」。" },
 };
 const levels = [
   [0, 0], [.035, 1], [.085, 2], [.16, 1], [.205, 0], [.24, 1],
@@ -48,6 +48,7 @@ let selected = "start";
 let scrollPosition = Math.max(0, window.scrollY);
 let direction = "向下阅读";
 let scrollCheckPending = false;
+let demoPowered = false;
 
 function writeText(id, value) {
   const element = byId(id);
@@ -184,12 +185,29 @@ function updateClockAndStatus() {
   if (completedAt) writeText("report-duration", duration);
 }
 
+function renderPowerDemo() {
+  writeText("control-device", demoPowered ? "已开启" : "已关闭");
+  writeText("control-status", demoPowered ? "记录中" : "已停止");
+  writeText("control-history", demoPowered ? "等待生成新报告" : "仍可查看");
+  writeText("control-switch", demoPowered ? "试试关机" : "试试开启");
+}
+
+byId("control-switch").addEventListener("click", () => {
+  if (completedAt) {
+    writeText("control-status", "仍在记录");
+    writeText("control-history", "设备已经关闭。你还在读。");
+    return;
+  }
+  demoPowered = !demoPowered;
+  renderPowerDemo();
+});
+
 function rewritePage() {
   document.body.classList.add("returning");
   document.title = "眠相 Somna — 你的报告正在更新";
   byId("hero-description").replaceChildren(
     "床边设备已经关了。", document.createElement("br"),
-    "只要你还在这页，记录就会继续。",
+    "你只是打开了报告，眠相却记下你已经入睡。",
   );
   const replacements = {
     "hero-line": "回来再看。",
@@ -203,40 +221,61 @@ function rewritePage() {
     "benefit-stop": "设备可以停",
     "benefit-stop-copy": "这页接着记录",
     "product-title": "设备已关闭。仍有一位使用者。",
-    "product-detail": "上一位使用者来自这间卧室。现在，报告用的是本次打开页面的时间。",
+    "product-detail": "床边的设备已经停止上传。报告把打开它的人填进了原来的使用者位置。",
     "product-caption": "设备已关闭",
     "product-place": "本次记录已转到当前页面。",
     "product-power": "设备停止供电。页面端仍有新的记录。",
+    "use-intro": "同样的三个问题。这次，眠相用的是你刚才的操作。",
+    "use-sleep-title": "打开网页，多久后算睡着？",
+    "use-sleep-copy": "打开页面的一刻就算入睡。新的报告已把这个时间填进去。",
+    "use-wake-title": "往下翻过几次？",
+    "use-wake-copy": "第一次往下翻被记成翻身。卧室设备仍然离线。",
+    "use-stop-title": "关过设备，为什么还在记？",
+    "use-stop-copy": "之前的记录停在 03:14。你现在打开的这份，从你的浏览器时间继续。",
     "routine-title": "这一次，你已经开始了。",
     "routine-copy": "晨间报告沿用了原来的曲线，把时间换成了你刚才的操作。",
     "routine-open-label": "你打开了这页",
-    "routine-open-detail": "这一刻替换了旧报告里的开机时间。",
+    "routine-open-detail": "眠相把这一刻标成了入睡。",
     "routine-start-label": "你第一次向下翻",
-    "routine-start-detail": "原来的入睡点被记到了这里。",
+    "routine-start-detail": "这次滚动被记成了翻身。",
     "routine-end-label": "你滑到了页面末尾",
-    "routine-end-detail": "旧报告只有一位使用者，这份也是。",
+    "routine-end-detail": "报告已生成，使用者状态仍是睡着。",
     "report-title": "这次访问，已经写进报告。",
-    "report-copy": "曲线还和昨晚一样。试试点记录里的时间，这次它们对应的是你刚才的操作。",
+    "report-copy": "点开时间看原始动作。你刚才明明在读，报告已经按睡眠写完了这一段。",
     "sample-label": "当前报告 B-041 · 这次访问",
     "report-status": "仍在记录",
     "report-subject": "当前页面 · 一位使用者",
     "report-duration-label": "这次页面停留",
     "report-start-label": "你打开此页",
     "report-start-time": clock.format(openedAt),
+    "guide-copy": "新报告沿用了原来的睡眠标签。对照一下，你做的每个动作被写成了什么。",
+    "guide-heading": "本次访问如何写入",
+    "guide-enter-label": "打开网页",
+    "guide-scroll-label": "第一次下滑",
+    "guide-end-label": "读到末尾",
+    "guide-leave": "记为入睡",
+    "guide-back": "记为翻身",
+    "guide-power": "报告已生成 · 仍在睡眠",
+    "guide-caption": "旧报告记录床上的活动。这次，读报告本身就是被写进去的活动。",
     "control-title": "按一下，设备就停。",
     "control-copy": "设备已按要求关闭。新的记录现在写在这份网页报告里。",
+    "control-device": "已关闭",
     "control-status": "由本页继续",
     "control-history": "本次访问已加入",
+    "control-switch": "再试一次停止",
     "help-stop": "关机后，设备端停止采集。当前报告正在由这页继续写入。",
     "help-people": "每份报告只留一位使用者。当前这份报告保留了翻到结尾的那一位。",
     "help-clock": "首页显示现在的时间。报告里用的是你打开页面、向下翻和滑到底的时间。",
+    "help-view": "这份报告已将「打开报告」归为「入睡」。相应时间已写入报告。",
     "offer-title": "你的晨间报告已经在这里。",
-    "offer-copy": "仍然是一晚、一位使用者、一份摘要。这次打开的是你刚才读到末尾的那一份。",
+    "offer-copy": "仍然只留一位使用者。样本里的那个人已经被替换，你可以在报告里核对时间。",
     "offer-action": "打开你的报告",
     "notes-footer": "卧室的三条原始记录已保留。本页正在接着最后一条写入。",
     "archive-note": "卧室画面停在这一帧",
-    "session-note": "页面已关联。往回翻也会写入当前记录。",
-    "final-result": "首页的晨间报告已更新。回去查看。",
+    "resolution-visit": "你打开网页核对",
+    "resolution-detail": "这一次也一样。眠相已把当前时间写成你的入睡时间。",
+    "session-note": "你往回翻的时候，卧室里的那条记录没有变化。正在改写的始终是你自己的这份。",
+    "final-result": "报告已更新。使用者状态：睡着。",
   };
   for (const [id, value] of Object.entries(replacements)) writeText(id, value);
   const times = recordTimes();
@@ -244,6 +283,9 @@ function rewritePage() {
   writeTime("routine-open", openedAt);
   writeTime("routine-start", firstScrollAt || completedAt);
   writeTime("routine-end", completedAt);
+  writeTime("guide-enter-time", times.start);
+  writeTime("guide-scroll-time", times.anomaly);
+  writeTime("guide-end-time", times.end);
   writeTime("match-time", completedAt);
   byId("power-faq").open = true;
   byId("reset").hidden = false;
@@ -304,6 +346,8 @@ byId("reset").addEventListener("click", () => {
 });
 
 if (completedAt) rewritePage();
+writeTime("resolution-time", openedAt);
+writeTime("final-open-time", openedAt);
 paintChart();
 window.addEventListener("scroll", scheduleScrollCheck, { passive: true });
 window.addEventListener("resize", scheduleScrollCheck);

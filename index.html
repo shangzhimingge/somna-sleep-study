@@ -6,8 +6,8 @@
   <meta name="theme-color" content="#14141b">
   <meta name="description" content="眠相 SOMNA。床边睡眠监测，醒来再看。">
   <title>眠相 Somna — 好眠，从今晚开始</title>
-  <link rel="stylesheet" href="styles.css?v=5">
-  <script src="story.js?v=5" defer></script>
+  <link rel="stylesheet" href="styles.css?v=6">
+  <script src="story.js?v=6" defer></script>
 </head>
 <body id="home">
   <header class="masthead">
@@ -64,6 +64,19 @@
       </div>
     </section>
 
+    <section class="use-cases" aria-labelledby="use-title">
+      <div class="frame">
+        <p class="eyebrow"><span class="small-rule"></span> 为自己的夜晚而用</p>
+        <h2 id="use-title">有些事，睡过就忘了。</h2>
+        <p class="use-intro" id="use-intro">早上只记得睡得好不好。想知道具体发生了什么，可以先从这三个问题看起。</p>
+        <div class="use-grid">
+          <article><span class="use-icon" aria-hidden="true">◐</span><h3 id="use-sleep-title">躺下后，多久才睡着？</h3><p id="use-sleep-copy">把上床和入睡分开记录。第二天可以看出，在床上那段时间有多少是真的在睡觉。</p></article>
+          <article><span class="use-icon" aria-hidden="true">◌</span><h3 id="use-wake-title">半夜起来过几次？</h3><p id="use-wake-copy">监测器只认床面范围内的信号。起床倒水时，报告会标注离床；回来后才接着记录。</p></article>
+          <article><span class="use-icon" aria-hidden="true">◫</span><h3 id="use-stop-title">什么时候就不再记了？</h3><p id="use-stop-copy">醒来后按下开关，报告停在关机那刻。打开晨间报告只是回看，不会开始下一次记录。</p></article>
+        </div>
+      </div>
+    </section>
+
     <section class="routine" id="how" aria-labelledby="routine-title">
       <div class="frame routine-layout">
         <div>
@@ -107,6 +120,25 @@
       </div>
     </section>
 
+    <section class="guide" aria-labelledby="guide-title">
+      <div class="frame guide-layout">
+        <div>
+          <p class="eyebrow"><span class="small-rule"></span> 看懂晨间报告</p>
+          <h2 id="guide-title">看清一晚，也看清每条记录从哪来。</h2>
+          <p id="guide-copy">我们把睡眠活动和设备状态放在同一份报告里。看见不熟悉的标记时，先对照那一刻床上有没有人、设备开着还是关着。</p>
+        </div>
+        <div class="guide-example">
+          <p class="guide-heading" id="guide-heading">一次正常的起夜</p>
+          <ol>
+            <li><time id="guide-enter-time" datetime="01:08">01:08</time><span id="guide-enter-label">离开床面</span><strong id="guide-leave">床位无人 · 停记</strong></li>
+            <li><time id="guide-scroll-time" datetime="01:11">01:11</time><span id="guide-scroll-label">重新躺下</span><strong id="guide-back">一位使用者 · 继续记录</strong></li>
+            <li><time id="guide-end-time" datetime="07:24">07:24</time><span id="guide-end-label">设备关机</span><strong id="guide-power">本晚结束 · 待查看</strong></li>
+          </ol>
+          <p class="guide-caption" id="guide-caption">设备记录床上的活动。打开这份报告，只是把这些活动读一遍。</p>
+        </div>
+      </div>
+    </section>
+
     <section class="control" id="control" aria-labelledby="control-title">
       <div class="frame control-layout">
         <div>
@@ -116,8 +148,8 @@
         </div>
         <div class="control-card">
           <p class="control-card-title">关机后的状态</p>
-          <dl><div><dt>床边设备</dt><dd>已关闭</dd></div><div><dt>新的监测记录</dt><dd id="control-status">已停止</dd></div><div><dt>历史报告</dt><dd id="control-history">仍可查看</dd></div></dl>
-          <a class="article-link" href="#help">查看使用问题</a>
+          <dl><div><dt>床边设备</dt><dd id="control-device">已关闭</dd></div><div><dt>新的监测记录</dt><dd id="control-status">已停止</dd></div><div><dt>晨间报告</dt><dd id="control-history" role="status">仍可查看</dd></div></dl>
+          <div class="control-actions"><button type="button" id="control-switch">试试开启</button><a class="article-link" href="#help">查看使用问题</a></div>
         </div>
       </div>
     </section>
@@ -133,6 +165,7 @@
           <details id="power-faq"><summary>设备关掉后还会继续记录吗？</summary><p id="help-stop">设备一关，新的记录就停止。历史报告可以在这里照常查看。</p></details>
           <details><summary>这一台能同时记录几个人？</summary><p id="help-people">床边版面向单人使用。每一晚的摘要只对应一位使用者。</p></details>
           <details><summary>为什么 02:17 有个标记？</summary><p>有些片段受环境干扰，暂时无法判定。它们会单独列在<a href="#notes">报告附注</a>里。</p></details>
+          <details><summary>打开报告会再次开始监测吗？</summary><p id="help-view">查看报告和监测是两件事。网页只显示设备已经保存的记录。</p></details>
           <details><summary>首页的时钟和报告是同一个时间吗？</summary><p id="help-clock">首页显示你设备上的当前时间。报告保存昨晚的时间，方便第二天回看。</p></details>
         </div>
       </div>
@@ -154,11 +187,11 @@
         <div>
           <p class="eyebrow"><span class="small-rule"></span> 报告附注 · B-041</p>
           <h2 id="notes-title">02:17 的那条标记。</h2>
-          <p class="records-copy">当晚只有一位使用者。设备先把第二组呼吸归为背景，之后又记录到了两次例外。</p>
+          <p class="records-copy">这间房只有一张床，报告也登记了一个人。设备在 02:17 检测到两组规律的呼吸，于是先把其中一组标成了背景。</p>
           <ol class="log" aria-label="标记前后的监测记录">
             <li><time datetime="02:17">02:17</time><span>检测到两组呼吸。</span></li>
-            <li><time datetime="02:21">02:21</time><span>床被判定为空。两组呼吸都还在。</span></li>
-            <li><time datetime="03:14">03:14</time><span>床边设备已关闭。仍有一组记录更新。</span></li>
+            <li><time datetime="02:21">02:21</time><span>使用者起床去了走廊。他的那组呼吸停了。床已空，另一组还在。</span></li>
+            <li><time datetime="03:14">03:14</time><span>使用者关机并拔掉电源。设备停止上传，第二组记录仍在更新。</span></li>
           </ol>
           <p class="footnote" id="notes-footer">这条标记已从晨间摘要中移除，原始记录仍保留。</p>
         </div>
@@ -172,17 +205,35 @@
       </div>
     </section>
 
+    <section class="resolution" aria-labelledby="resolution-title">
+      <div class="frame resolution-layout">
+        <div>
+          <p class="eyebrow"><span class="small-rule"></span> 使用帮助 · 关机后仍有记录</p>
+          <h2 id="resolution-title">报告能不能停在 03:14？</h2>
+          <p id="resolution-copy">使用者从手机打开了这份报告，想确认最后一条记录的时间。设备状态显示已离线，报告却多了一条更新。</p>
+        </div>
+        <div class="resolution-card">
+          <p class="resolution-heading">报告 B-041 · 处理记录</p>
+          <ol>
+            <li><time datetime="03:14">03:14</time><div><strong>床边设备离线</strong><p>报告应该在这里结束。</p></div></li>
+            <li><time datetime="03:19">03:19</time><div><strong>使用者打开网页核对</strong><p>同一份报告把 03:19 标成了「重新入睡」。</p></div></li>
+            <li><time id="resolution-time">--:--:--</time><div><strong id="resolution-visit">你打开了当前页面</strong><p id="resolution-detail">这就是你进入这页的时间。床边设备仍处于离线状态。</p></div></li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
     <section class="session" id="session" aria-labelledby="session-title">
       <div class="narrow">
         <p class="eyebrow"><span class="small-rule"></span> 关机后的记录</p>
-        <h2 id="session-title">设备停在 03:14。</h2>
-        <p class="session-copy">下面这条记录使用的是你现在正在看的页面。试着停一下，或往回翻一小段。</p>
+        <h2 id="session-title">现在，谁在写这份报告？</h2>
+        <p class="session-copy">左边是卧室设备停下时的记录。右边来自这个页面。试着往回滑一小段，再看哪边会变。</p>
         <dl class="session-panel">
-          <div><dt>当前时间</dt><dd><time id="reader-time">--:--:--</time></dd></div>
-          <div><dt>你已在这页停留</dt><dd id="reader-duration">00:00</dd></div>
-          <div><dt>你的阅读方向</dt><dd id="reader-direction">向下阅读</dd></div>
+          <div class="device-session"><dt>卧室设备 · 已离线</dt><dd><time datetime="03:14">03:14:00</time><small>最后一次上传</small></dd></div>
+          <div><dt>当前页面 · 正在写入</dt><dd><time id="reader-time">--:--:--</time><small>最新一条记录</small></dd></div>
+          <div><dt>这次访问</dt><dd id="reader-duration">00:00</dd><dd class="session-direction" id="reader-direction">向下阅读</dd></div>
         </dl>
-        <p class="session-note" id="session-note">床边设备已关闭。本页的记录仍在更新。</p>
+        <p class="session-note" id="session-note">这就是 03:19 出现的新来源。设备关掉了，同一份报告却把打开网页的人当成了床上的人。</p>
       </div>
     </section>
 
@@ -199,11 +250,12 @@
       </div>
       <div class="narrow final-tail">
         <div class="final-checkpoint" id="final-checkpoint">
-          <div><span>旧报告的使用者</span><strong>卧室里的那一位</strong></div>
-          <div><span>新报告的使用者</span><strong>正在阅读这页的人</strong></div>
-          <div><span>更新时间</span><time id="match-time">--:--:--</time></div>
+          <div><span>旧记录的来源</span><strong>床边设备 · 已断开</strong></div>
+          <div><span>这份报告现在用的是</span><strong>你打开网页的时间</strong></div>
+          <div><span>你的「入睡时间」</span><time id="final-open-time">--:--:--</time></div>
+          <div><span>最后更新</span><time id="match-time">--:--:--</time></div>
         </div>
-        <p class="final-result" id="final-result">正在更新首页的晨间报告。</p>
+        <p class="final-result" id="final-result">正在用本次访问替换样本报告。</p>
         <button type="button" class="return" id="return">回到首页</button>
       </div>
     </section>
