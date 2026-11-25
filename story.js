@@ -6,10 +6,12 @@ const reportButtons = [...document.querySelectorAll("[data-record]")];
 const comparison = byId("comparison-chart");
 const comparisonContext = comparison.getContext("2d");
 const nightButtons = [...document.querySelectorAll("[data-night]")];
+const versionButtons = [...document.querySelectorAll("[data-version]")];
 const heroPhoto = byId("hero-photo");
 const review = byId("review");
+const endpoint = byId("endpoint");
 const checkpoint = byId("final-checkpoint");
-const storyKey = "somna-b041-completed-v3";
+const storyKey = "somna-b041-completed-v4";
 const clock = new Intl.DateTimeFormat("zh-CN", {
   hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23",
 });
@@ -51,6 +53,7 @@ function restoreCompletion() {
 
 let completedAt = restoreCompletion();
 let reviewStartedAt = null;
+let endpointReached = false;
 let pauseStartedAt = null;
 let lastPauseSeconds = 0;
 let totalForeground = 0;
@@ -65,9 +68,9 @@ const records = {
   end: { position: 1, text: "07:24　监测结束，已生成晨间摘要。" },
 };
 const revisedRecords = {
-  start: "23:48　检测到一位使用者入睡。另一位已在等待。",
-  anomaly: "02:17　已按原记录保留第二组呼吸。两份样本禁止合并。",
-  end: "07:24　结案后仍有一位使用者在读取。已将档案交还给当前阅览端。",
+  start: "23:48　入睡点已保留。使用者已重新关联。",
+  anomaly: "02:17　两条信号已归于同一位使用者。原始分轨仍可查看。",
+  end: "07:24　已生成历史摘要。当前使用者记录仍在更新。",
 };
 const levels = [
   [0, 0], [.035, 1], [.085, 2], [.16, 1], [.205, 0], [.24, 1],
@@ -81,8 +84,20 @@ const nights = [
   { delay: -.24, note: "第三晚 · 两次吸气几乎重合。这次，第二组信号提前了约 0.2 秒。" },
   { delay: 0, note: "第四晚 · 两条曲线完全重合。设备已找不到分开保存这两条记录的依据。" },
 ];
+const versions = {
+  published: { count: "1 人", source: "床边监测器", method: "晨间定时发布", note: "已发布版本会保留归并后的人数。" },
+  original: { count: "1 人 · 2 条信号", source: "床面 / 床面以下", method: "保留两个原始通道", note: "两个通道的位置信息分别保留。" },
+  merge: { count: "0 人 → 1 人", source: "床位为空 · 信号保留", method: "按最后一位使用者恢复", note: "归并规则：至少保留一位使用者。" },
+};
+const resumedVersion = {
+  count: "1 人",
+  source: "当前页面",
+  method: "继续写入",
+  note: "此版本已覆盖上一次发布的晨间摘要。",
+};
 let selected = "start";
 let nightIndex = 0;
+let version = "published";
 
 function sizeCanvas(canvas, context) {
   if (!context) return;
@@ -201,7 +216,7 @@ function selectNight(index) {
     button.setAttribute("aria-pressed", String(Number(button.dataset.night) === index));
   }
   const selectedNote = completedAt && index === 3
-    ? "第四晚 · 原文件已合并。保留的副本归当前阅览端所有。"
+    ? "第四晚 · 已保留两条原始曲线。记录来源已更新为当前会话。"
     : nights[index].note;
   writeText("comparison-note", selectedNote);
   paintComparison();
@@ -209,6 +224,22 @@ function selectNight(index) {
 
 for (const button of nightButtons) {
   button.addEventListener("click", () => selectNight(Number(button.dataset.night)));
+}
+
+function selectVersion(key) {
+  version = key;
+  for (const button of versionButtons) {
+    button.setAttribute("aria-pressed", String(button.dataset.version === key));
+  }
+  const item = completedAt && key === "published" ? resumedVersion : versions[key];
+  writeText("version-count", item.count);
+  writeText("version-source", item.source);
+  writeText("version-method", item.method);
+  writeText("version-note", item.note);
+}
+
+for (const button of versionButtons) {
+  button.addEventListener("click", () => selectVersion(button.dataset.version));
 }
 
 function paintCharts() {
@@ -245,32 +276,50 @@ function writeText(id, value) {
   if (element.textContent !== value) element.textContent = value;
 }
 
+function updateEndpoint(localTime) {
+  const viewing = document.hidden ? "后台" : "前台";
+  writeText("mirror-reader-direction", direction);
+  writeText("mirror-reader-focus", viewing);
+  if (!document.hidden) writeTime(byId("mirror-reader-time"), localTime);
+
+  if (endpointReached || completedAt) {
+    writeText("mirror-room-direction", direction);
+    writeText("mirror-room-focus", viewing);
+    if (!document.hidden) writeTime(byId("mirror-room-time"), localTime);
+    writeText("mirror-note", completedAt
+      ? "已核验。当前会话是唯一仍在写入的来源。"
+      : "两个来源状态一致。设备仍处于离线状态。");
+  }
+}
+
 function updateLiveDetails() {
   if (document.hidden) return;
   const now = performance.now();
   const liveForeground = totalForeground + (foregroundStartedAt === null ? 0 : now - foregroundStartedAt);
   const localDate = new Date();
   updateHero(localDate);
-  writeTime(byId("reader-time"), localDate.getTime());
+  const localTime = localDate.getTime();
+  writeTime(byId("reader-time"), localTime);
+  updateEndpoint(localTime);
   writeText("reader-duration", durationLabel(liveForeground));
   writeText("reader-direction", direction);
 
   let state = "等待关联";
   let message = "等待阅读端连接。";
   if (completedAt) {
-    state = "归档已写回";
+    state = "来源已关联";
     message = direction === "向上回看"
-      ? "已记录回看。首页正在使用新的校准结果。"
-      : "本页已接管校时。晨间摘要已更新。";
+      ? "已同步向上回看。已发布的晨间摘要发生变更。"
+      : "当前阅览端正在写入。两端的时钟保持一致。";
   } else if (reviewStartedAt !== null) {
     const elapsed = Math.floor((liveForeground - reviewStartedAt) / 1000);
     state = "阅读端已连接";
     if (lastPauseSeconds > 0) {
-      message = `你离开页面约 ${lastPauseSeconds} 秒。另一组记录在这段时间里始终处于前台。`;
+      message = `页面曾离开前台约 ${lastPauseSeconds} 秒。另一端的写入次数仍在增加。`;
     } else if (elapsed >= 14) {
-      message = "两条记录都在使用此时钟。其中一条早于你打开这页。";
+      message = "来源重复：一份记录早于当前会话开始，却在使用当前会话的时间。";
     } else if (elapsed >= 6) {
-      message = "检测到上次阅览仍未结束。两条记录暂时并行保存。";
+      message = "检测到重复来源。正在按当前连接核验。";
     } else {
       message = "校时完成。正在查找上一次校验。";
     }
@@ -281,29 +330,32 @@ function updateLiveDetails() {
 
 function applyConclusion() {
   document.body.classList.add("returning");
-  document.title = "眠相 Somna — 上次阅览尚未结束";
+  document.title = "眠相 Somna — 监测中";
   byId("hero-description").replaceChildren(
     "在你睡着的时候，眠相替你留意。", document.createElement("br"),
-    "你回来的时候，另一份报告已经在等你。",
+    "当前使用者已关联。晨间摘要会在这里更新。",
   );
   const replacements = {
     "hero-line": "从头开始。",
     "nav-report": "查看复核",
-    "routine-copy": "设备已完成这张床的校准。下一次记录会从你刚才离开的地方继续。",
-    "routine-last": "晨间摘要已覆盖。旧摘要仍由系统保留。",
-    "report-copy": "这份晨间报告在你读到最后一条记录时重新生成。点击原来的时间点，核对现在归在它们下面的话。",
+    "routine-copy": "本次校准已完成。监测来源已从床边监测器迁移至当前页面。",
+    "routine-last": "摘要已写回。当前使用者记录仍在更新。",
+    "report-copy": "晨间摘要已重新生成。切换原来的时间点，可以核对更新后的来源。",
     "report-status": "阅览后重算",
-    "report-subject": "B-041 / 来源已合并",
-    "calibration-result": "通过。已按当前记录保留一位。",
-    "calibration-note": "原始记录曾标注两位。此处的差异已按阅览端说明修正。",
-    "ticket-state": "已重新打开",
-    "ticket-footer": "工单已在当前阅览端打开。另一份副本继续标为「已处理」。",
-    "appendix-label": "已撤回的附注 / B-041",
-    "appendix-note": "原报告中的「使用者」指住在这个房间的人。该定义已被新记录替换。",
-    "archive-note": "此画面已被读取。它仍在等你第二次经过。",
-    "handoff-source": "发件人：当前阅览端 · 该回复在你阅读前已经发出",
-    "review-note": "终止归档后，系统把当前阅览端列为唯一有效来源。",
-    "match-result": "第二段已移交给当前阅览端",
+    "report-subject": "B-041 / 当前页面",
+    "help-clock": "首页与新的报告共用本地时钟。页面再次打开时，会继续使用当前时钟。",
+    "calibration-result": "通过。沿用关联后的使用者人数。",
+    "calibration-note": "标记已移入当前报告。旧报告的原始分轨仍然保留。",
+    "ticket-state": "已自动重开",
+    "ticket-footer": "工单在当前页面重新打开。原提交者已从这份工单移除。",
+    "appendix-label": "已重算的附注 / B-041",
+    "appendix-note": "床位人数为 0。报告人数为 1。已沿用报告人数。",
+    "archive-note": "原附件仍然冻结 · 当前页面持续更新",
+    "continuity-record": "已改由当前页面写入",
+    "retention-mode": "持续写入",
+    "retention-note": "恢复范围已更新：本次访问被恢复为一位使用者。",
+    "review-note": "当前阅览端已关联为有效来源。",
+    "final-result": "归并完成。原使用者已从本次监测移除。",
   };
   for (const [id, value] of Object.entries(replacements)) {
     byId(id).textContent = value;
@@ -312,6 +364,7 @@ function applyConclusion() {
   byId("reset").hidden = false;
   selectRecord(selected);
   selectNight(nightIndex);
+  selectVersion(version);
 }
 
 function finishStory() {
@@ -339,6 +392,8 @@ function checkScroll() {
     const now = performance.now();
     reviewStartedAt = totalForeground + (foregroundStartedAt === null ? 0 : now - foregroundStartedAt);
   }
+  const endpointBounds = endpoint.getBoundingClientRect();
+  if (endpointBounds.top < window.innerHeight * .72 && endpointBounds.bottom > 0) endpointReached = true;
   const bounds = checkpoint.getBoundingClientRect();
   if (bounds.top < window.innerHeight * .85 && bounds.bottom > 0) finishStory();
   updateLiveDetails();
@@ -356,6 +411,7 @@ document.addEventListener("visibilitychange", () => {
     if (foregroundStartedAt !== null) totalForeground += now - foregroundStartedAt;
     foregroundStartedAt = null;
     pauseStartedAt = reviewStartedAt === null ? null : now;
+    updateEndpoint(Date.now());
   } else {
     foregroundStartedAt = now;
     if (pauseStartedAt !== null) lastPauseSeconds = Math.floor((now - pauseStartedAt) / 1000);
