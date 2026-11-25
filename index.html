@@ -6,15 +6,15 @@
   <meta name="theme-color" content="#14141b">
   <meta name="description" content="眠相 Somna，给每一个夜晚一份清晰的回答。">
   <title>眠相 Somna — 好眠，从今晚开始</title>
-  <link rel="stylesheet" href="styles.css?v=2">
-  <script src="story.js?v=2" defer></script>
+  <link rel="stylesheet" href="styles.css?v=3">
+  <script src="story.js?v=3" defer></script>
 </head>
 <body id="home">
   <header class="masthead">
     <div class="frame nav">
       <a class="brand" href="#home" aria-label="眠相首页"><span class="moon" aria-hidden="true"></span> SOMNA<span class="brand-divider"></span><span class="brand-cn">眠相</span></a>
       <nav aria-label="主要导航">
-        <a href="#how">工作原理</a><a href="#report">睡眠报告</a>
+        <a href="#product">床边设备</a><a href="#how">工作原理</a><a href="#report">睡眠报告</a><a href="#help">帮助中心</a>
       </nav>
       <a class="nav-link" id="nav-report" href="#report">体验监测</a>
     </div>
@@ -32,12 +32,12 @@
         </div>
       </div>
       <figure class="hero-image">
-        <img src="assets/hero.webp" alt="暮色透过落地窗，照在铺着深蓝色床品的卧室里" width="1536" height="1024" fetchpriority="high">
-        <figcaption><span></span><span id="hero-status">夜间监测中</span><time id="hero-time" datetime="23:48">23:48</time></figcaption>
+        <img id="hero-photo" src="assets/hero.webp" alt="暮色透过落地窗，照在铺着深蓝色床品的卧室里" width="1536" height="1024" fetchpriority="high">
+        <figcaption><span></span><span id="hero-status">样本卧室</span><time id="hero-time">--:--:--</time></figcaption>
       </figure>
     </section>
 
-    <aside class="benefits" id="how" aria-label="工作原理">
+    <aside class="benefits" aria-label="核心功能">
       <div class="frame benefits-row">
         <div><span class="line-icon pulse" aria-hidden="true"></span><span><strong>呼吸节律</strong><small>从床边感知呼吸变化</small></span></div>
         <div><span class="line-icon phases" aria-hidden="true"></span><span><strong>睡眠分期</strong><small>读懂一整晚的深浅起伏</small></span></div>
@@ -45,7 +45,26 @@
       </div>
     </aside>
 
-    <section class="routine" aria-labelledby="routine-title">
+    <section class="product" id="product" aria-labelledby="product-title">
+      <div class="frame product-layout">
+        <figure class="product-photo">
+          <img src="assets/device.webp" alt="浅色眠相传感器放在床边的木质柜面上" width="1296" height="864" loading="lazy">
+          <figcaption>床头柜摆放示意</figcaption>
+        </figure>
+        <div class="product-copy">
+          <p class="eyebrow"><span class="small-rule"></span> 眠相床边监测器</p>
+          <h2 id="product-title">床边，留一点位置。</h2>
+          <p>将监测器放在床头柜上。睡觉时无需佩戴设备，也不用改变平时的睡姿。</p>
+          <dl class="product-facts">
+            <div><dt>睡前</dt><dd>按平时的习惯关灯，设备会自行完成校准。</dd></div>
+            <div><dt>夜里</dt><dd>状态灯会熄灭，夜间提醒默认静音。</dd></div>
+            <div><dt>醒来</dt><dd>从晨间摘要查看入睡、翻身和清醒的时间。</dd></div>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <section class="routine" id="how" aria-labelledby="routine-title">
       <div class="frame routine-layout">
         <div>
           <p class="eyebrow"><span class="small-rule"></span> 从入睡到清晨</p>
@@ -85,17 +104,69 @@
       </div>
     </section>
 
+    <section class="help" id="help" aria-labelledby="help-title">
+      <div class="frame help-layout">
+        <div>
+          <p class="eyebrow"><span class="small-rule"></span> 帮助中心</p>
+          <h2 id="help-title">第一次使用，可能会问。</h2>
+          <p>关于摆放位置、晨间报告和这间样本卧室。</p>
+        </div>
+        <div class="faq">
+          <details><summary>监测器需要一直连着手机吗？</summary><p>睡前完成设置就可以把手机放在一边。示例中的监测器会在本地写入夜间记录，晨间报告会在下次打开时同步。</p></details>
+          <details><summary>宠物走动会被写进报告吗？</summary><p>短暂走动通常会被排除。信号难以判断时，报告会在时间轴上标注该时段，方便你对照当晚的情况。</p></details>
+          <details><summary>为什么床上只有一个人，报告还是给出了标记？</summary><p>标记只表示信号需要复核。你可以在工单里补充当晚的情况，再决定是否把这段记录计入报告。</p></details>
+          <details><summary>网页上的时间来自哪里？</summary><p>这页展示的是虚构样本。首页按当前浏览器的本地时间切换卧室画面，阅读状态也只在这个页面使用。</p></details>
+        </div>
+      </div>
+    </section>
+
     <section class="calibration" aria-labelledby="calibration-title">
       <div class="narrow">
-        <p class="eyebrow"><span class="small-rule"></span> 监测说明</p>
-        <h2 id="calibration-title">有些声音，不属于睡眠。</h2>
+        <p class="eyebrow"><span class="small-rule"></span> 帮助文章 · 信号复核</p>
+        <h2 id="calibration-title">如何读懂一次信号标记。</h2>
         <p class="calibration-copy">窗帘轻碰墙面、楼上的水管、隔一堵墙传来的脚步声，都可能出现在原始记录里。眠相会过滤掉这些干扰。</p>
         <dl class="checks">
           <div><dt>样本设置</dt><dd>单人卧室</dd></div>
           <div><dt>睡前校准</dt><dd>通过。室内只有一组规律信号。</dd></div>
           <div><dt>自动复查</dt><dd id="calibration-result">通过。室内应该只有一组规律信号。</dd></div>
         </dl>
-        <p class="calibration-note" id="calibration-note">02:17 的标记已从晨间摘要移除。原始记录保留。</p>
+        <p class="calibration-note" id="calibration-note">样本 B-041 的 02:17 标记已从晨间摘要移除。原始记录保留。</p>
+        <a class="article-link" href="#support">查看这个样本的复核过程</a>
+      </div>
+    </section>
+
+    <section class="support" id="support" aria-labelledby="support-title">
+      <div class="narrow">
+        <p class="eyebrow"><span class="small-rule"></span> 支持记录 / B-041</p>
+        <h2 id="support-title">凌晨的标记能关掉吗？</h2>
+        <div class="support-ticket">
+          <div class="ticket-heading"><span>记录异常 · 同一时段反复标记</span><span id="ticket-state">已处理</span></div>
+          <ol class="ticket-thread">
+            <li><p class="ticket-meta"><span>用户</span><time datetime="08:42">第一天 08:42</time></p><p>这两天都在差不多的时间出现标记。我自己住，也没有养宠物。需要重新摆一下设备吗？</p></li>
+            <li><p class="ticket-meta"><span>眠相支持</span><time datetime="09:13">第一天 09:13</time></p><p>请先保持位置不变。我们已把标记从摘要里移除，今晚会用相同位置的记录作对照。</p></li>
+            <li><p class="ticket-meta"><span>用户</span><time datetime="07:36">第三天 07:36</time></p><p>我昨晚醒着等了一会儿。试着屏住呼吸的时候，那个声音也停了。重新开始之前，我听见自己还没吸进去的那口气。</p></li>
+          </ol>
+          <p class="ticket-footer" id="ticket-footer">工单自动结束。连续三次复核均未达到报警阈值。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="comparison" aria-labelledby="comparison-title">
+      <div class="narrow">
+        <p class="eyebrow"><span class="small-rule"></span> B-041 · 逐夜复核</p>
+        <h2 id="comparison-title">第二条曲线越来越近。</h2>
+        <p class="comparison-copy">复核员截取了每晚出现标记前后的片段，保留了两条曲线上原来的时间差。灰线是设备连续四晚都归为背景信号的那一条。</p>
+        <div class="comparison-card">
+          <div class="comparison-input" role="group" aria-label="切换对照夜次">
+            <button type="button" aria-pressed="true" data-night="0">第一晚</button>
+            <button type="button" aria-pressed="false" data-night="1">第二晚</button>
+            <button type="button" aria-pressed="false" data-night="2">第三晚</button>
+            <button type="button" aria-pressed="false" data-night="3">第四晚</button>
+          </div>
+          <canvas id="comparison-chart" role="img" aria-label="使用者呼吸和第二组信号对照"></canvas>
+          <div class="comparison-legend"><span><i></i>使用者</span><span><i></i>第二组信号</span></div>
+          <p id="comparison-note" aria-live="polite">第一晚 · 第二组信号平均落后 1.8 秒。</p>
+        </div>
       </div>
     </section>
 
@@ -107,8 +178,8 @@
         <ol class="log" aria-label="监测记录">
           <li><time datetime="02:17">02:17:06</time><span>检测到第二组呼吸。</span></li>
           <li><time datetime="02:18">02:18:19</time><span>主信号中断十一秒。第二组随即中断十一秒。</span></li>
-          <li><time datetime="02:21">02:21:44</time><span>使用者起床查看。两组呼吸同时恢复。<small>床垫压力：0 kg</small></span></li>
-          <li><time datetime="02:24">02:24:11</time><span>使用者重新躺下。<small>床垫压力：未变化</small></span></li>
+          <li><time datetime="02:21">02:21:44</time><span>使用者起床查看。两组呼吸同时恢复。<small>床位判定：无人</small></span></li>
+          <li><time datetime="02:24">02:24:11</time><span>使用者重新躺下。<small>床位判定：仍然无人</small></span></li>
         </ol>
         <p class="footnote" id="appendix-note">这段记录已连续三晚被系统归为背景噪音。第四晚，它开始跟着另一组信号一起停下。</p>
       </div>
@@ -119,24 +190,50 @@
         <div class="archive-caption">
           <p class="eyebrow"><span class="small-rule"></span> 原始记录 / 第四晚</p>
           <h2 id="archive-title">你关门了吗？</h2>
-          <p>使用者在睡前留言里说，他每晚都会把门关严。只有半夜醒过来时，门才会留着一条缝。</p>
-          <p>这是第二组呼吸出现之前，设备保留的最后一帧。</p>
+          <p>用户把自家走廊摄像头的截图补进工单。他想确认卧室的门是什么时候开的。</p>
+          <p>摄像头只能拍到门和床沿。这一帧里，他说自己还没醒。</p>
         </div>
         <figure class="hall-frame">
           <div class="hall-image">
             <img src="assets/hall.webp" alt="深夜的走廊尽头，卧室门开着一条缝，缝里能看见床沿" width="1536" height="1024" loading="lazy">
             <span class="capture-time"><i></i> 02:16:59</span><span class="capture-id">B-041 / CAM 01</span>
           </div>
-          <figcaption><span id="archive-note">第二组呼吸出现前 7 秒</span><span>录音保留 · 画面归档</span></figcaption>
+          <figcaption><span id="archive-note">第二组呼吸出现前 7 秒</span><span>用户附件 · 走廊录像截图</span></figcaption>
         </figure>
+      </div>
+    </section>
+
+    <section class="transcript" aria-labelledby="transcript-title">
+      <div class="narrow">
+        <p class="eyebrow"><span class="small-rule"></span> 录音转写 / 03:13</p>
+        <h2 id="transcript-title">它学得很慢。</h2>
+        <p class="transcript-intro">走廊录像收到了两句话。用户注明第一句是他自己说的，第二句来自床下。复核员拿他在工单里留的语音做比对，两段都通过了。</p>
+        <dl class="dialogue">
+          <div><dt>03:13:02 <span>床上</span></dt><dd>「妈，我去上个厕所。」</dd></div>
+          <div><dt>03:13:05 <span>床下</span></dt><dd>「妈，别让他出去。」</dd></div>
+        </dl>
+        <p class="voice-match">声纹与使用者匹配<span id="match-result">两段均匹配</span></p>
+      </div>
+    </section>
+
+    <section class="handoff" aria-labelledby="handoff-title">
+      <div class="narrow">
+        <p class="eyebrow"><span class="small-rule"></span> 工单交接 / B-041</p>
+        <h2 id="handoff-title">第二天，他又来问了一次。</h2>
+        <p>他问的是「凌晨的标记能关掉吗」，跟第一天一字不差。客服翻回最早那条留言，发现下面已经有了一条回复。</p>
+        <blockquote>
+          <p>「我知道。你前面已经问过我了。」</p>
+          <cite id="handoff-source">发件人：B-041 的使用者 · 系统判定为两端同时在线</cite>
+        </blockquote>
+        <p class="handoff-caption">随后工单被关闭。关闭理由是：同一位用户，已在另一端得到答复。</p>
       </div>
     </section>
 
     <section class="review" id="review" aria-labelledby="review-title">
       <div class="narrow">
         <p class="eyebrow"><span class="small-rule"></span> 阅读端校验 / B-041</p>
-        <h2 id="review-title">记录还在写入。</h2>
-        <p class="review-intro">往下是第四晚的录音。设备时间停在 02:16:59 时，系统切换了校时来源。</p>
+        <h2 id="review-title">一端离线，另一端仍在写入。</h2>
+        <p class="review-intro">工单关闭后，卧室的设备再也没有送来记录。但第二条曲线仍在更新。它改用了这份报告被打开时的时间。</p>
         <div class="review-console">
           <div class="review-console-title"><span><i></i><span id="review-state">等待关联</span></span><span>B-041 / VIEW</span></div>
           <dl class="review-fields">
@@ -146,20 +243,7 @@
           </dl>
           <p class="review-log" id="review-log">等待阅读端连接。</p>
         </div>
-        <p class="review-note" id="review-note">如果设备时间再次停止，请以阅读端为准。</p>
-      </div>
-    </section>
-
-    <section class="transcript" aria-labelledby="transcript-title">
-      <div class="narrow">
-        <p class="eyebrow"><span class="small-rule"></span> 录音转写 / 03:13</p>
-        <h2 id="transcript-title">它学得很慢。</h2>
-        <p class="transcript-intro">第四晚，第二组呼吸终于和第一组完全重合。设备准备合并两条记录时，从不同方位收到了同一个人的声音。</p>
-        <dl class="dialogue">
-          <div><dt>03:13:02 <span>床上</span></dt><dd>「妈，我去上个厕所。」</dd></div>
-          <div><dt>03:13:05 <span>床下</span></dt><dd>「妈，别让他出去。」</dd></div>
-        </dl>
-        <p class="voice-match">声纹与使用者匹配<span id="match-result">两段均匹配</span></p>
+        <p class="review-note" id="review-note">本次复核已暂停向卧室设备发送数据。</p>
       </div>
     </section>
 

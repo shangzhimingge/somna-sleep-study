@@ -3,12 +3,42 @@ const chart = byId("chart");
 const context = chart.getContext("2d");
 const note = byId("chart-note");
 const reportButtons = [...document.querySelectorAll("[data-record]")];
+const comparison = byId("comparison-chart");
+const comparisonContext = comparison.getContext("2d");
+const nightButtons = [...document.querySelectorAll("[data-night]")];
+const heroPhoto = byId("hero-photo");
 const review = byId("review");
 const checkpoint = byId("final-checkpoint");
-const storyKey = "somna-b041-completed-v2";
+const storyKey = "somna-b041-completed-v3";
 const clock = new Intl.DateTimeFormat("zh-CN", {
   hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23",
 });
+
+const lighting = [
+  { from: 20, src: "assets/night.webp", label: "夜间监测", alt: "夜色中的卧室，窗边是微弱的蓝光，床头灯亮着" },
+  { from: 17, src: "assets/hero.webp", label: "睡前校准", alt: "暮色透过落地窗，照在铺着深蓝色床品的卧室里" },
+  { from: 8, src: "assets/day.webp", label: "日间待机", alt: "白天的卧室，淡蓝色天空和山景映在落地窗外" },
+  { from: 5, src: "assets/dawn.webp", label: "晨间回顾", alt: "清晨的卧室，落地窗外的山间还带着一层薄雾" },
+];
+let requestedPhoto = heroPhoto.getAttribute("src");
+
+function updateHero(localDate) {
+  writeTime(byId("hero-time"), localDate.getTime());
+  const hour = localDate.getHours();
+  const scene = lighting.find(({ from }) => hour >= from) || lighting[0];
+  writeText("hero-status", completedAt ? "复核已写回" : scene.label);
+  if (scene.src === requestedPhoto) return;
+
+  requestedPhoto = scene.src;
+  if (heroPhoto.getAttribute("src") === scene.src) return;
+  const nextPhoto = new Image();
+  nextPhoto.onload = () => {
+    if (requestedPhoto !== scene.src) return;
+    heroPhoto.src = scene.src;
+    heroPhoto.alt = scene.alt;
+  };
+  nextPhoto.src = scene.src;
+}
 
 function restoreCompletion() {
   try {
@@ -45,16 +75,30 @@ const levels = [
   [.56, 1], [.605, 2], [.66, 1], [.74, 2], [.79, 1], [.86, 0],
   [.895, 1], [.958, 0], [1, 0],
 ];
+const nights = [
+  { delay: 1.8, note: "第一晚 · 第二组信号平均落后 1.8 秒。" },
+  { delay: .9, note: "第二晚 · 用户翻身后，第二组信号的延迟缩短到 0.9 秒。" },
+  { delay: -.24, note: "第三晚 · 两次吸气几乎重合。这次，第二组信号提前了约 0.2 秒。" },
+  { delay: 0, note: "第四晚 · 两条曲线完全重合。设备已找不到分开保存这两条记录的依据。" },
+];
 let selected = "start";
+let nightIndex = 0;
 
-function paintChart() {
+function sizeCanvas(canvas, context) {
   if (!context) return;
-  const { width, height } = chart.getBoundingClientRect();
+  const { width, height } = canvas.getBoundingClientRect();
   if (width === 0 || height === 0) return;
   const density = Math.min(window.devicePixelRatio || 1, 3);
-  chart.width = Math.round(width * density);
-  chart.height = Math.round(height * density);
+  canvas.width = Math.round(width * density);
+  canvas.height = Math.round(height * density);
   context.setTransform(density, 0, 0, density, 0, 0);
+  return { width, height };
+}
+
+function paintChart() {
+  const dimensions = sizeCanvas(chart, context);
+  if (!dimensions) return;
+  const { width, height } = dimensions;
 
   const x = (position) => 5 + position * (width - 10);
   const y = (level) => 12 + level * ((height - 24) / 2);
@@ -100,6 +144,43 @@ function paintChart() {
   context.setLineDash([]);
 }
 
+function paintComparison() {
+  const ctx = comparisonContext;
+  const dimensions = sizeCanvas(comparison, ctx);
+  if (!dimensions) return;
+  const { width, height } = dimensions;
+  const mid = height / 2;
+  const inset = 2;
+  ctx.strokeStyle = "#625165";
+  ctx.lineWidth = 1;
+  for (const level of [.23, .5, .77]) {
+    ctx.beginPath();
+    ctx.moveTo(inset, height * level);
+    ctx.lineTo(width - inset, height * level);
+    ctx.stroke();
+  }
+
+  const wave = (delay, color, dashes) => {
+    ctx.beginPath();
+    const steps = Math.max(1, Math.floor(width - 2 * inset));
+    for (let n = 0; n <= steps; n++) {
+      const time = n / steps * 22 - delay;
+      const phase = time * 1.63 + .14 * Math.sin(time * .68);
+      const signal = Math.sin(phase) + .18 * Math.sin(2 * phase + .8);
+      const y = mid - mid * .52 * signal;
+      if (n === 0) ctx.moveTo(inset, y);
+      else ctx.lineTo(inset + n, y);
+    }
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = color;
+    ctx.setLineDash(dashes);
+    ctx.stroke();
+  };
+  wave(0, "#dda6b2", []);
+  wave(nights[nightIndex].delay, "#a5a3b7", [4, 5]);
+  ctx.setLineDash([]);
+}
+
 function selectRecord(key) {
   selected = key;
   for (const button of reportButtons) {
@@ -114,12 +195,35 @@ for (const button of reportButtons) {
   button.addEventListener("click", () => selectRecord(button.dataset.record));
 }
 
-if (typeof ResizeObserver === "function") {
-  new ResizeObserver(paintChart).observe(chart);
-} else {
-  window.addEventListener("resize", paintChart);
+function selectNight(index) {
+  nightIndex = index;
+  for (const button of nightButtons) {
+    button.setAttribute("aria-pressed", String(Number(button.dataset.night) === index));
+  }
+  const selectedNote = completedAt && index === 3
+    ? "第四晚 · 原文件已合并。保留的副本归当前阅览端所有。"
+    : nights[index].note;
+  writeText("comparison-note", selectedNote);
+  paintComparison();
 }
-paintChart();
+
+for (const button of nightButtons) {
+  button.addEventListener("click", () => selectNight(Number(button.dataset.night)));
+}
+
+function paintCharts() {
+  paintChart();
+  paintComparison();
+}
+
+if (typeof ResizeObserver === "function") {
+  const resizeObserver = new ResizeObserver(paintCharts);
+  resizeObserver.observe(chart);
+  resizeObserver.observe(comparison);
+} else {
+  window.addEventListener("resize", paintCharts);
+}
+paintCharts();
 
 function writeTime(element, milliseconds) {
   const date = new Date(milliseconds);
@@ -145,7 +249,9 @@ function updateLiveDetails() {
   if (document.hidden) return;
   const now = performance.now();
   const liveForeground = totalForeground + (foregroundStartedAt === null ? 0 : now - foregroundStartedAt);
-  writeTime(byId("reader-time"), Date.now());
+  const localDate = new Date();
+  updateHero(localDate);
+  writeTime(byId("reader-time"), localDate.getTime());
   writeText("reader-duration", durationLabel(liveForeground));
   writeText("reader-direction", direction);
 
@@ -182,7 +288,6 @@ function applyConclusion() {
   );
   const replacements = {
     "hero-line": "从头开始。",
-    "hero-status": "复核已写回",
     "nav-report": "查看复核",
     "routine-copy": "设备已完成这张床的校准。下一次记录会从你刚才离开的地方继续。",
     "routine-last": "晨间摘要已覆盖。旧摘要仍由系统保留。",
@@ -191,19 +296,22 @@ function applyConclusion() {
     "report-subject": "B-041 / 来源已合并",
     "calibration-result": "通过。已按当前记录保留一位。",
     "calibration-note": "原始记录曾标注两位。此处的差异已按阅览端说明修正。",
+    "ticket-state": "已重新打开",
+    "ticket-footer": "工单已在当前阅览端打开。另一份副本继续标为「已处理」。",
     "appendix-label": "已撤回的附注 / B-041",
     "appendix-note": "原报告中的「使用者」指住在这个房间的人。该定义已被新记录替换。",
     "archive-note": "此画面已被读取。它仍在等你第二次经过。",
+    "handoff-source": "发件人：当前阅览端 · 该回复在你阅读前已经发出",
     "review-note": "终止归档后，系统把当前阅览端列为唯一有效来源。",
     "match-result": "第二段已移交给当前阅览端",
   };
   for (const [id, value] of Object.entries(replacements)) {
     byId(id).textContent = value;
   }
-  writeTime(byId("hero-time"), completedAt);
   writeTime(byId("match-time"), completedAt);
   byId("reset").hidden = false;
   selectRecord(selected);
+  selectNight(nightIndex);
 }
 
 function finishStory() {
